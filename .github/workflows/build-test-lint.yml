@@ -22,11 +22,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up CMake
-        uses: cmake-actions/cmake-action@v3
-        with:
-          version: '3.20.x'
-
       - name: Install dependencies (Ubuntu)
         if: runner.os == 'Linux'
         run: |
@@ -79,7 +74,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.compiler }}
           path: build/
@@ -89,11 +84,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up CMake
-        uses: cmake-actions/cmake-action@v3
-        with:
-          version: '3.20.x'
 
       - name: Install clang-tidy
         run: |
@@ -114,11 +104,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up CMake
-        uses: cmake-actions/cmake-action@v3
-        with:
-          version: '3.20.x'
 
       - name: Install dependencies
         run: |
