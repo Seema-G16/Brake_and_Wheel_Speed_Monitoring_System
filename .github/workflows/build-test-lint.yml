@@ -43,34 +43,28 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake -B build \
-            -DCMAKE_CXX_STANDARD=17 \
-            -DCMAKE_BUILD_TYPE=Release
+          cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Release
+        shell: bash
 
       - name: Build project
         run: cmake --build build --config Release
+        shell: bash
 
       - name: Run unit tests
         run: |
           cd build
           ctest --verbose --output-on-failure
+        shell: bash
 
       - name: Run cppcheck linting
         if: runner.os == 'Linux'
-        run: |
-          cppcheck --enable=all --suppress=missingIncludeSystem \
-            --std=c++17 \
-            --error-exitcode=1 \
-            src/ include/ tests/
+        run: cppcheck --enable=all --suppress=missingIncludeSystem --std=c++17 --error-exitcode=1 src/ include/ tests/
+        shell: bash
 
       - name: Run cppcheck linting (Windows)
         if: runner.os == 'Windows'
-        run: |
-          cppcheck --enable=all --suppress=missingIncludeSystem `
-            --std=c++17 `
-            --error-exitcode=1 `
-            src/ include/ tests/
-        shell: powershell
+        run: cppcheck --enable=all --suppress=missingIncludeSystem --std=c++17 --error-exitcode=1 src/ include/ tests/
+        shell: bash
 
       - name: Upload test results
         if: always()
@@ -91,13 +85,12 @@ jobs:
           sudo apt-get install -y clang-tidy clang build-essential
 
       - name: Configure CMake with clang-tidy
-        run: |
-          cmake -B build \
-            -DCMAKE_CXX_STANDARD=17 \
-            -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--checks=-*,readability-*,performance-*,modernize-*"
+        run: cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--checks=-*,readability-*,performance-*,modernize-*"
+        shell: bash
 
       - name: Build with clang-tidy
         run: cmake --build build
+        shell: bash
 
   code-coverage:
     runs-on: ubuntu-latest
@@ -111,19 +104,18 @@ jobs:
           sudo apt-get install -y build-essential gcov lcov
 
       - name: Configure CMake with coverage
-        run: |
-          cmake -B build \
-            -DCMAKE_CXX_STANDARD=17 \
-            -DCMAKE_CXX_FLAGS="--coverage" \
-            -DCMAKE_EXE_LINKER_FLAGS="--coverage"
+        run: cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_EXE_LINKER_FLAGS="--coverage"
+        shell: bash
 
       - name: Build project
         run: cmake --build build
+        shell: bash
 
       - name: Run tests for coverage
         run: |
           cd build
           ctest --verbose
+        shell: bash
 
       - name: Generate coverage report
         run: |
@@ -131,9 +123,10 @@ jobs:
           lcov --directory . --capture --output-file coverage.info
           lcov --remove coverage.info '*/googletest/*' '*/tests/*' --output-file coverage.info
           lcov --list coverage.info
+        shell: bash
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./build/coverage.info
           flags: unittests

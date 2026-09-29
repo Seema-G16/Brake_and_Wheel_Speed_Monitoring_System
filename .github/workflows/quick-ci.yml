@@ -22,20 +22,19 @@ jobs:
         run: |
           cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Release
           cmake --build build
+        shell: bash
 
       - name: Run unit tests
         run: |
           cd build
           ctest --verbose --output-on-failure
+        shell: bash
 
       - name: Run linting (cppcheck)
-        run: |
-          cppcheck --enable=all --suppress=missingIncludeSystem \
-            --std=c++17 --error-exitcode=1 \
-            src/ include/
+        run: cppcheck --enable=all --suppress=missingIncludeSystem --std=c++17 --error-exitcode=1 src/ include/
+        shell: bash
 
       - name: Lint tests directory
         continue-on-error: true
-        run: |
-          cppcheck --enable=all --suppress=missingIncludeSystem \
-            --std=c++17 tests/
+        run: cppcheck --enable=all --suppress=missingIncludeSystem --std=c++17 tests/
+        shell: bash
