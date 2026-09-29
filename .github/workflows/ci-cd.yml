@@ -1,0 +1,232 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, training, develop ]
+  pull_request:
+    branches: [ main, training, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        compiler: [gcc, clang]
+        exclude:
+          - os: windows-latest
+            compiler: clang
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+          if [ "${{ matrix.compiler }}" = "clang" ]; then
+            sudo apt-get install -y clang
+          fi
+        shell: bash
+
+      - name: Install cppcheck (Ubuntu)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y cppcheck
+        shell: bash
+
+      - name: Install cppcheck (Windows)
+        if: runner.os == 'Windows'
+        run: choco install cppcheck -y
+        shell: powershell
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Release
+        shell: bash
+
+      - name: Build project
+        run: cmake --build build --config Release
+        shell: bash
+
+      - name: Run unit tests
+        run: |
+          cd build
+          ctest --verbose --output-on-failure
+        shell: bash
+
+      - name: Run cppcheck linting
+        if: runner.os == 'Linux'
+        run: cppcheck --enable=all --suppress=missingIncludeSystem --suppress=unusedFunction -Iinclude --std=c++17 --error-exitcode=1 src/ tests/
+        shell: bash
+
+      - name: Run cppcheck linting (Windows)
+        if: runner.os == 'Windows'
+        run: cppcheck --enable=all --suppress=missingIncludeSystem --suppress=unusedFunction -Iinclude --std=c++17 --error-exitcode=1 src/ tests/
+        shell: bash
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.compiler }}
+          path: build/
+
+  clang-tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install clang-tidy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-tidy clang build-essential
+        shell: bash
+
+      - name: Configure CMake with clang-tidy
+        run: cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--checks=-*,readability-*,performance-*,modernize-*"
+        shell: bash
+
+      - name: Build with clang-tidy
+        run: cmake --build build
+        shell: bash
+
+  code-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gcov lcov
+        shell: bash
+
+      - name: Configure CMake with coverage
+        run: cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_EXE_LINKER_FLAGS="--coverage"
+        shell: bash
+
+      - name: Build project
+        run: cmake --build build
+        shell: bash
+
+      - name: Run tests for coverage
+        run: |
+          cd build
+          ctest --verbose
+        shell: bash
+
+      - name: Generate coverage report
+        run: |
+          cd build
+          lcov --directory . --capture --output-file coverage.info
+          lcov --remove coverage.info '*/googletest/*' '*/tests/*' --output-file coverage.info
+          lcov --list coverage.info
+        shell: bash
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./build/coverage.info
+          flags: unittests
+          name: codecov-umbrella
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy security scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  status-check:
+    needs: [build-and-test, clang-tidy, code-coverage]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check build status
+        run: |
+          if [[ "${{ needs.build-and-test.result }}" == "failure" ]]; then
+            echo "❌ Build/Test job failed"
+            exit 1
+          fi
+          if [[ "${{ needs.clang-tidy.result }}" == "failure" ]]; then
+            echo "❌ Clang-tidy job failed"
+            exit 1
+          fi
+          if [[ "${{ needs.code-coverage.result }}" == "failure" ]]; then
+            echo "❌ Code coverage job failed"
+            exit 1
+          fi
+          echo "✅ All checks passed!"
+        shell: bash
+
+  # ============================================================================
+  # DEPLOYMENT JOB - Configure with your AWS details
+  # ============================================================================
+  deploy:
+    needs: status-check
+    runs-on: ubuntu-latest
+    # Only deploy on main or training branch, not on pull requests
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/training')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          # Store AWS private key from GitHub Secret
+          echo "${{ secrets.AWS_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          # Add AWS instance to known_hosts to avoid SSH verification prompt
+          ssh-keyscan -H ${{ secrets.AWS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        shell: bash
+
+      - name: Update deployment log with IST timestamp
+        run: |
+          # Get current time in IST format
+          TIMESTAMP=$(TZ='Asia/Kolkata' date '+%Y-%m-%d %H:%M:%S IST')
+          
+          # SSH into AWS instance and append timestamp to file
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+            ${{ secrets.AWS_USERNAME }}@${{ secrets.AWS_HOST }} \
+            "echo 'Deployment completed at: $TIMESTAMP (Branch: ${{ github.ref_name }})' >> ${{ secrets.DEPLOYMENT_LOG_PATH }}"
+        shell: bash
+
+      - name: Verify deployment
+        run: |
+          echo "✅ Deployment successful!"
+          echo "Instance: ${{ secrets.AWS_HOST }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Timestamp saved to: ${{ secrets.DEPLOYMENT_LOG_PATH }}"
+        shell: bash
+
+  # Optional: Notify deployment status
+  notify-deployment:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Deployment Status
+        run: |
+          if [[ "${{ needs.deploy.result }}" == "success" ]]; then
+            echo "✅ Deployment succeeded"
+          else
+            echo "❌ Deployment failed"
+          fi
+        shell: bash
