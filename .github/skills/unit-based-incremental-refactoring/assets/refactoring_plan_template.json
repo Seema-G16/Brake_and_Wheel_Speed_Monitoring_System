@@ -1,0 +1,97 @@
+{
+  "refactoring_metadata": {
+    "component": "COMPONENT_NAME",
+    "description": "Brief description of what's being refactored",
+    "start_date": "2024-09-29",
+    "estimated_completion_date": "2024-09-29",
+    "status": "PLANNED"
+  },
+  "objectives": {
+    "primary": "What is the main goal? (e.g., reduce complexity, improve readability)",
+    "secondary": [
+      "Additional goals (e.g., add test coverage, extract methods)"
+    ],
+    "success_metrics": {
+      "complexity": {
+        "current": 0,
+        "target": 0,
+        "unit": "cyclomatic complexity"
+      },
+      "test_coverage": {
+        "current": "0%",
+        "target": "100%"
+      },
+      "lines_of_code": {
+        "current": 0,
+        "target": 0
+      }
+    }
+  },
+  "scope_analysis": {
+    "component_loc": 0,
+    "total_functions": 0,
+    "functions": [
+      {
+        "id": 1,
+        "name": "function_name",
+        "current_loc": 0,
+        "current_complexity": 0,
+        "covering_tests": [
+          "TC-XXX-001",
+          "TC-XXX-002"
+        ],
+        "estimated_refactoring_time_minutes": 30,
+        "risk_level": "LOW"
+      }
+    ],
+    "total_covering_tests": 0,
+    "constraints": [
+      "Cannot change public interface",
+      "Must maintain backward compatibility"
+    ]
+  },
+  "refactoring_phases": [
+    {
+      "phase_number": 1,
+      "function_name": "function_1",
+      "start_time": "2024-09-29T09:00:00",
+      "estimated_duration_minutes": 30,
+      "status": "PLANNED",
+      "refactoring_approach": "Describe what changes will be made",
+      "validation_plan": {
+        "covering_tests": ["TC-XXX-001"],
+        "full_suite_validation": true,
+        "metrics_check": true
+      },
+      "notes": ""
+    }
+  ],
+  "dependencies": {
+    "internal": [
+      {
+        "component": "OtherComponent",
+        "reason": "This component depends on OtherComponent"
+      }
+    ],
+    "external": []
+  },
+  "risk_assessment": {
+    "overall_risk": "LOW",
+    "identified_risks": [
+      {
+        "risk": "Regressions in dependent components",
+        "probability": "LOW",
+        "impact": "MEDIUM",
+        "mitigation": "Run full 52-test suite after each unit"
+      }
+    ]
+  },
+  "communication_plan": {
+    "stakeholders": ["Team Lead", "Code Reviewer"],
+    "notifications": {
+      "on_start": true,
+      "on_completion": true,
+      "on_issues": true
+    }
+  }
+}

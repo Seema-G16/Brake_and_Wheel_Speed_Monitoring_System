@@ -1,0 +1,31 @@
+# Build outputs
+build/
+_deps/
+*.o
+*.a
+*.so
+*.exe
+*.dll
+*.lib
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.vscode-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Testing
+Testing/Temporary/
+*.gcda
+*.gcno
+coverage.info

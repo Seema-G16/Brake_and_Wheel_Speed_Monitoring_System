@@ -1,0 +1,425 @@
+"Testcase ID","Testcase Name","Test Description","Input","Test Case Type","Expected Output","Actual Output","Automated (Yes/No)","Comments"
+"TC-BRK-001","Braking condition active with normal pressure","Verify braking condition is true and brake status is normal when pedal pressed and vehicle moving with valid pressure","Timestamp=1.0s
+VehicleSpeed=50 km/h
+BrakePedal=TRUE
+BrakePressure=40 bar
+FL=50 km/h
+FR=50 km/h
+RL=50 km/h
+RR=50 km/h","Positive","BrakeStatus=NORMAL; Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers BRK-01, BRK-02"
+"TC-BRK-002","Brake pedal released while driving","Verify no braking condition and no brake fault when pedal released while vehicle moving","Timestamp=2.0s
+VehicleSpeed=50 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=50 km/h
+FR=50 km/h
+RL=50 km/h
+RR=50 km/h","Positive","BrakeStatus=NORMAL; Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers BRK-01 (pedal released path); section 9 Brake Tests 'Brake pedal released'"
+"TC-BRK-003","Stationary vehicle with pedal pressed and zero pressure","Verify BRAKE_PRESSURE_FAULT is not reported when vehicle speed is exactly 0 km/h even if pressure is 0","Timestamp=3.0s
+VehicleSpeed=0 km/h
+BrakePedal=TRUE
+BrakePressure=0 bar
+FL=0 km/h
+FR=0 km/h
+RL=0 km/h
+RR=0 km/h","Edge","BrakeStatus=NORMAL; Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers BRK-04; boundary VehicleSpeed=0"
+"TC-BRK-004","Braking fault just above zero speed boundary","Verify BRAKE_PRESSURE_FAULT is reported when vehicle speed is just above 0 km/h, pedal pressed, and pressure is 0","Timestamp=4.0s
+VehicleSpeed=0.1 km/h
+BrakePedal=TRUE
+BrakePressure=0 bar
+FL=0.1 km/h
+FR=0.1 km/h
+RL=0.1 km/h
+RR=0.1 km/h","Edge","BrakeStatus=FAULT; Faults=BRAKE_PRESSURE_FAULT; OverallStatus=FAULT","Pending","Yes","Covers BRK-01, BRK-03; boundary VehicleSpeed just above 0"
+"TC-BRK-005","Brake pressure fault while braking","Verify BRAKE_PRESSURE_FAULT is reported when braking condition is active and pressure equals 0 bar","Timestamp=5.0s
+VehicleSpeed=60 km/h
+BrakePedal=TRUE
+BrakePressure=0 bar
+FL=60 km/h
+FR=60 km/h
+RL=60 km/h
+RR=60 km/h","Negative","BrakeStatus=FAULT; Faults=BRAKE_PRESSURE_FAULT; OverallStatus=FAULT","Pending","Yes","Covers BRK-03; section 9 'Brake pedal pressed with 0 bar pressure'"
+"TC-BRK-006","Brake pressure lower boundary valid","Verify brake pressure of exactly 0 bar is treated as valid input when not braking","Timestamp=6.0s
+VehicleSpeed=30 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=30 km/h
+FR=30 km/h
+RL=30 km/h
+RR=30 km/h","Edge","BrakeStatus=NORMAL; Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers BRK-05 lower boundary; section 9 'Brake pressure exactly 0 bar'"
+"TC-BRK-007","Brake pressure upper boundary valid","Verify brake pressure of exactly 100 bar is treated as valid and normal while braking","Timestamp=7.0s
+VehicleSpeed=70 km/h
+BrakePedal=TRUE
+BrakePressure=100 bar
+FL=70 km/h
+FR=70 km/h
+RL=70 km/h
+RR=70 km/h","Edge","BrakeStatus=NORMAL; Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers BRK-05 upper boundary; section 9 'Brake pressure exactly 100 bar'"
+"TC-BRK-008","Brake pressure just above upper boundary","Verify INVALID_BRAKE_PRESSURE is reported when pressure is just above 100 bar","Timestamp=8.0s
+VehicleSpeed=70 km/h
+BrakePedal=TRUE
+BrakePressure=100.1 bar
+FL=70 km/h
+FR=70 km/h
+RL=70 km/h
+RR=70 km/h","Edge","Faults=INVALID_BRAKE_PRESSURE; OverallStatus=INVALID_DATA","Pending","Yes","Covers BRK-05; section 9 'Brake pressure greater than 100 bar'"
+"TC-BRK-009","Negative brake pressure","Verify INVALID_BRAKE_PRESSURE is reported when brake pressure is negative","Timestamp=9.0s
+VehicleSpeed=40 km/h
+BrakePedal=TRUE
+BrakePressure=-1 bar
+FL=40 km/h
+FR=40 km/h
+RL=40 km/h
+RR=40 km/h","Negative","Faults=INVALID_BRAKE_PRESSURE; OverallStatus=INVALID_DATA","Pending","Yes","Covers BRK-05; section 9 'Negative brake pressure'"
+"TC-BRK-010","Brake pressure far above valid range","Verify INVALID_BRAKE_PRESSURE is reported for a grossly out-of-range brake pressure value","Timestamp=10.0s
+VehicleSpeed=40 km/h
+BrakePedal=TRUE
+BrakePressure=150 bar
+FL=40 km/h
+FR=40 km/h
+RL=40 km/h
+RR=40 km/h","Negative","Faults=INVALID_BRAKE_PRESSURE; OverallStatus=INVALID_DATA","Pending","Yes","Covers BRK-05"
+"TC-BRK-011","Brake pedal fully released at speed","Verify normal status with brake pedal released at nonzero speed and zero pressure","Timestamp=11.0s
+VehicleSpeed=90 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=90 km/h
+FR=90 km/h
+RL=90 km/h
+RR=90 km/h","Positive","BrakeStatus=NORMAL; Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers section 9 'Brake pedal released'"
+"TC-BRK-012","Braking above 0 km/h with normal pressure","Verify normal brake status when braking above 0 km/h with pressure within valid, non-zero range","Timestamp=12.0s
+VehicleSpeed=100 km/h
+BrakePedal=TRUE
+BrakePressure=42 bar
+FL=98 km/h
+FR=97 km/h
+RL=96 km/h
+RR=94 km/h","Positive","BrakeStatus=NORMAL; Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers BRK-02; section 9 'Brake pedal pressed above 0 km/h with normal pressure'"
+"TC-WHL-001","All wheels within tolerance of vehicle speed","Verify no wheel-speed mismatch faults when all wheel speeds are within 10 km/h of vehicle speed","Timestamp=13.0s
+VehicleSpeed=80 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=82 km/h
+FR=79 km/h
+RL=81 km/h
+RR=78 km/h","Positive","WheelStatus=NORMAL; Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers WHL-01, WHL-02"
+"TC-WHL-002","Wheel difference exactly 10 km/h boundary","Verify a wheel-speed difference of exactly 10 km/h is not a mismatch","Timestamp=14.0s
+VehicleSpeed=80 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=80 km/h
+FR=80 km/h
+RL=70 km/h
+RR=80 km/h","Edge","WheelStatus=NORMAL; Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers WHL-04 boundary (no fault at exactly 10 km/h)"
+"TC-WHL-003","Wheel difference just above 10 km/h boundary","Verify a wheel-speed difference of 10.1 km/h is reported as a mismatch","Timestamp=15.0s
+VehicleSpeed=80 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=80 km/h
+FR=80 km/h
+RL=69.9 km/h
+RR=80 km/h","Edge","WheelStatus=FAULT; Faults=RL_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers WHL-02, WHL-04 boundary (fault just above 10 km/h)"
+"TC-WHL-004","Front-left wheel mismatch","Verify FL_WHEEL_SPEED_MISMATCH is reported when only the front-left wheel exceeds the threshold","Timestamp=16.0s
+VehicleSpeed=80 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=95 km/h
+FR=79 km/h
+RL=81 km/h
+RR=78 km/h","Negative","WheelStatus=FAULT; Faults=FL_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers WHL-02"
+"TC-WHL-005","Front-right wheel mismatch","Verify FR_WHEEL_SPEED_MISMATCH is reported when only the front-right wheel exceeds the threshold","Timestamp=17.0s
+VehicleSpeed=80 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=82 km/h
+FR=95 km/h
+RL=81 km/h
+RR=78 km/h","Negative","WheelStatus=FAULT; Faults=FR_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers WHL-02"
+"TC-WHL-006","Rear-left wheel mismatch (spec example)","Verify RL_WHEEL_SPEED_MISMATCH is reported using the exact example from the requirements","Timestamp=18.0s
+VehicleSpeed=80 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=82 km/h
+FR=79 km/h
+RL=68 km/h
+RR=81 km/h","Negative","WheelStatus=FAULT; Faults=RL_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers WHL-02; matches requirements.md worked example"
+"TC-WHL-007","Rear-right wheel mismatch","Verify RR_WHEEL_SPEED_MISMATCH is reported when only the rear-right wheel exceeds the threshold","Timestamp=19.0s
+VehicleSpeed=80 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=82 km/h
+FR=79 km/h
+RL=81 km/h
+RR=95 km/h","Negative","WheelStatus=FAULT; Faults=RR_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers WHL-02"
+"TC-WHL-008","Two simultaneous wheel mismatches","Verify both FL_WHEEL_SPEED_MISMATCH and RR_WHEEL_SPEED_MISMATCH are reported together","Timestamp=20.0s
+VehicleSpeed=80 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=95 km/h
+FR=79 km/h
+RL=81 km/h
+RR=95 km/h","Exhaustive","WheelStatus=FAULT; Faults=FL_WHEEL_SPEED_MISMATCH,RR_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers WHL-03; section 9 'Two wheel mismatches'"
+"TC-WHL-009","All four wheels mismatching","Verify all four wheel-speed mismatch faults are reported simultaneously","Timestamp=21.0s
+VehicleSpeed=80 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=95 km/h
+FR=95 km/h
+RL=95 km/h
+RR=95 km/h","Exhaustive","WheelStatus=FAULT; Faults=FL_WHEEL_SPEED_MISMATCH,FR_WHEEL_SPEED_MISMATCH,RL_WHEEL_SPEED_MISMATCH,RR_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers WHL-03; section 9 'All wheels mismatching'"
+"TC-WHL-010","All wheel speeds equal to vehicle speed","Verify no wheel-speed faults when all wheel speeds exactly equal vehicle speed","Timestamp=22.0s
+VehicleSpeed=80 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=80 km/h
+FR=80 km/h
+RL=80 km/h
+RR=80 km/h","Positive","WheelStatus=NORMAL; Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers WHL-01; section 9 'All wheel speeds equal to vehicle speed'"
+"TC-WHL-011","Large wheel spread while not braking","Verify BRAKING_WHEEL_SPEED_MISMATCH is not reported when braking condition is inactive, even with a large wheel-speed spread","Timestamp=23.0s
+VehicleSpeed=80 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=80 km/h
+FR=80 km/h
+RL=80 km/h
+RR=60 km/h","Edge","WheelStatus=FAULT; Faults=RR_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers WHL-05 (braking-gate condition false; only mismatch fault applies, not braking-spread fault)"
+"TC-WHL-012","Braking wheel-speed spread exactly 15 km/h","Verify BRAKING_WHEEL_SPEED_MISMATCH is not reported when spread equals exactly 15 km/h","Timestamp=24.0s
+VehicleSpeed=100 km/h
+BrakePedal=TRUE
+BrakePressure=50 bar
+FL=95 km/h
+FR=96 km/h
+RL=97 km/h
+RR=110 km/h","Edge","WheelStatus=NORMAL; Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers WHL-08 boundary (no fault at exactly 15 km/h spread)"
+"TC-WHL-013","Braking wheel-speed spread just above 15 km/h","Verify BRAKING_WHEEL_SPEED_MISMATCH is reported when spread is 15.1 km/h","Timestamp=25.0s
+VehicleSpeed=100 km/h
+BrakePedal=TRUE
+BrakePressure=50 bar
+FL=95 km/h
+FR=96 km/h
+RL=97 km/h
+RR=110.1 km/h","Edge","WheelStatus=FAULT; Faults=BRAKING_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers WHL-07, WHL-08 boundary (fault just above 15 km/h)"
+"TC-WHL-014","Braking wheel-speed spread requirements example","Verify BRAKING_WHEEL_SPEED_MISMATCH using the exact worked example from requirements.md","Timestamp=26.0s
+VehicleSpeed=100 km/h
+BrakePedal=TRUE
+BrakePressure=50 bar
+FL=98 km/h
+FR=97 km/h
+RL=95 km/h
+RR=75 km/h","Negative","WheelStatus=FAULT; Faults=BRAKING_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers WHL-06, WHL-07; matches requirements.md worked example (spread=23)"
+"TC-WHL-015","Normal wheel-speed spread while braking","Verify no braking wheel-speed fault when spread is small during braking","Timestamp=27.0s
+VehicleSpeed=100 km/h
+BrakePedal=TRUE
+BrakePressure=50 bar
+FL=99 km/h
+FR=98 km/h
+RL=97 km/h
+RR=96 km/h","Positive","WheelStatus=NORMAL; Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers WHL-06; section 9 'Normal wheel-speed spread during braking'"
+"TC-WHL-016","Combined wheel mismatch and braking spread fault","Verify both RR_WHEEL_SPEED_MISMATCH and BRAKING_WHEEL_SPEED_MISMATCH are reported together, matching the section 8 output example","Timestamp=28.0s
+VehicleSpeed=100 km/h
+BrakePedal=TRUE
+BrakePressure=42 bar
+FL=98 km/h
+FR=97 km/h
+RL=96 km/h
+RR=74 km/h","Exhaustive","WheelStatus=FAULT; Faults=RR_WHEEL_SPEED_MISMATCH,BRAKING_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers WHL-02, WHL-07; section 8 output example; section 9 'Multiple faults during braking'"
+"TC-WHL-017","Braking spread check inactive at zero speed","Verify braking wheel-speed spread check is inactive when vehicle speed is exactly 0 km/h even with pedal pressed","Timestamp=29.0s
+VehicleSpeed=0 km/h
+BrakePedal=TRUE
+BrakePressure=0 bar
+FL=0 km/h
+FR=0 km/h
+RL=0 km/h
+RR=30 km/h","Edge","WheelStatus=FAULT; Faults=RR_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers WHL-05 boundary (VehicleSpeed=0 disables braking-spread check; mismatch fault still evaluated independently)"
+"TC-FLT-001","No faults yields NO_FAULT and NORMAL","Verify NO_FAULT and overall NORMAL when all inputs are within normal operating conditions","Timestamp=30.0s
+VehicleSpeed=60 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=60 km/h
+FR=60 km/h
+RL=60 km/h
+RR=60 km/h","Positive","Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers FLT-01, FLT-04"
+"TC-FLT-002","Multiple simultaneous faults (spec example)","Verify BRAKE_PRESSURE_FAULT, RL_WHEEL_SPEED_MISMATCH, and RR_WHEEL_SPEED_MISMATCH are all reported together","Timestamp=31.0s
+VehicleSpeed=80 km/h
+BrakePedal=TRUE
+BrakePressure=0 bar
+FL=82 km/h
+FR=79 km/h
+RL=68 km/h
+RR=95 km/h","Exhaustive","Faults=BRAKE_PRESSURE_FAULT,RL_WHEEL_SPEED_MISMATCH,RR_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers FLT-02; matches requirements.md FLT-02 example"
+"TC-FLT-003","Fault recovery - wheel mismatch present (sample 1)","Verify RL_WHEEL_SPEED_MISMATCH is active in the first sample of a recovery sequence","Timestamp=32.0s
+VehicleSpeed=80 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=80 km/h
+FR=80 km/h
+RL=68 km/h
+RR=80 km/h","Exhaustive","Faults=RL_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers FLT-03 (sample 1 of 2); paired with TC-FLT-004"
+"TC-FLT-004","Fault recovery - wheel mismatch cleared (sample 2)","Verify RL_WHEEL_SPEED_MISMATCH is no longer reported once RL wheel speed returns to normal in the next sample","Timestamp=33.0s
+VehicleSpeed=80 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=80 km/h
+FR=80 km/h
+RL=80 km/h
+RR=80 km/h","Exhaustive","Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers FLT-03 (sample 2 of 2); recovers from TC-FLT-003"
+"TC-FLT-005","Fault recovery - brake pressure fault present (sample 1)","Verify BRAKE_PRESSURE_FAULT is active while braking with 0 bar pressure","Timestamp=34.0s
+VehicleSpeed=50 km/h
+BrakePedal=TRUE
+BrakePressure=0 bar
+FL=50 km/h
+FR=50 km/h
+RL=50 km/h
+RR=50 km/h","Exhaustive","Faults=BRAKE_PRESSURE_FAULT; OverallStatus=FAULT","Pending","Yes","Covers FLT-03 (sample 1 of 2); paired with TC-FLT-006"
+"TC-FLT-006","Fault recovery - brake pressure fault cleared (sample 2)","Verify BRAKE_PRESSURE_FAULT clears once brake pressure returns to a valid non-zero value","Timestamp=35.0s
+VehicleSpeed=50 km/h
+BrakePedal=TRUE
+BrakePressure=35 bar
+FL=50 km/h
+FR=50 km/h
+RL=50 km/h
+RR=50 km/h","Exhaustive","Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers FLT-03 (sample 2 of 2); recovers from TC-FLT-005"
+"TC-FLT-007","Multiple faults with partial recovery (sample 1)","Verify two simultaneous faults are active together before partial recovery","Timestamp=36.0s
+VehicleSpeed=80 km/h
+BrakePedal=TRUE
+BrakePressure=0 bar
+FL=95 km/h
+FR=79 km/h
+RL=81 km/h
+RR=78 km/h","Exhaustive","Faults=BRAKE_PRESSURE_FAULT,FL_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers FLT-02, FLT-03 (sample 1 of 2); paired with TC-FLT-008"
+"TC-FLT-008","Multiple faults with partial recovery (sample 2)","Verify only one fault remains active after the wheel-speed condition recovers while the brake fault persists","Timestamp=37.0s
+VehicleSpeed=80 km/h
+BrakePedal=TRUE
+BrakePressure=0 bar
+FL=82 km/h
+FR=79 km/h
+RL=81 km/h
+RR=78 km/h","Exhaustive","Faults=BRAKE_PRESSURE_FAULT; OverallStatus=FAULT","Pending","Yes","Covers FLT-03 (sample 2 of 2); recovers partially from TC-FLT-007"
+"TC-FLT-009","Overall status FAULT with single active fault","Verify overall status is FAULT when exactly one valid fault condition is active","Timestamp=38.0s
+VehicleSpeed=80 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=95 km/h
+FR=79 km/h
+RL=81 km/h
+RR=78 km/h","Positive","Faults=FL_WHEEL_SPEED_MISMATCH; OverallStatus=FAULT","Pending","Yes","Covers FLT-04"
+"TC-FLT-010","Overall status INVALID_DATA on invalid input","Verify overall status is INVALID_DATA rather than FAULT when input validation fails","Timestamp=39.0s
+VehicleSpeed=-10 km/h
+BrakePedal=TRUE
+BrakePressure=40 bar
+FL=50 km/h
+FR=50 km/h
+RL=50 km/h
+RR=50 km/h","Negative","Faults=INVALID_MONITORING_DATA; OverallStatus=INVALID_DATA","Pending","Yes","Covers FLT-04, DAT-01"
+"TC-DAT-001","Negative vehicle speed","Verify INVALID_MONITORING_DATA is reported when vehicle speed is negative","Timestamp=40.0s
+VehicleSpeed=-5 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=0 km/h
+FR=0 km/h
+RL=0 km/h
+RR=0 km/h","Negative","Faults=INVALID_MONITORING_DATA; OverallStatus=INVALID_DATA","Pending","Yes","Covers DAT-01; section 9 'Negative vehicle speed'"
+"TC-DAT-002","Negative wheel speed","Verify INVALID_MONITORING_DATA is reported when any wheel speed is negative","Timestamp=41.0s
+VehicleSpeed=50 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=50 km/h
+FR=50 km/h
+RL=-2 km/h
+RR=50 km/h","Negative","Faults=INVALID_MONITORING_DATA; OverallStatus=INVALID_DATA","Pending","Yes","Covers DAT-02; section 9 'Negative wheel speed'"
+"TC-DAT-003","Missing vehicle speed","Verify INVALID_MONITORING_DATA is reported when vehicle speed value is missing from the input sample","Timestamp=42.0s
+VehicleSpeed=MISSING
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=50 km/h
+FR=50 km/h
+RL=50 km/h
+RR=50 km/h","Negative","Faults=INVALID_MONITORING_DATA; OverallStatus=INVALID_DATA","Pending","Yes","Covers DAT-03; section 9 'Missing vehicle speed'"
+"TC-DAT-004","Missing wheel speed","Verify INVALID_MONITORING_DATA is reported when a wheel speed value is missing from the input sample","Timestamp=43.0s
+VehicleSpeed=50 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=50 km/h
+FR=MISSING
+RL=50 km/h
+RR=50 km/h","Negative","Faults=INVALID_MONITORING_DATA; OverallStatus=INVALID_DATA","Pending","Yes","Covers DAT-03; section 9 'Missing wheel speed'"
+"TC-DAT-005","Invalid brake pedal representation","Verify INVALID_MONITORING_DATA is reported when brake pedal status is neither TRUE nor FALSE","Timestamp=44.0s
+VehicleSpeed=50 km/h
+BrakePedal=MAYBE
+BrakePressure=20 bar
+FL=50 km/h
+FR=50 km/h
+RL=50 km/h
+RR=50 km/h","Negative","Faults=INVALID_MONITORING_DATA; OverallStatus=INVALID_DATA","Pending","Yes","Covers DAT-04; section 9 'Invalid brake pedal value'"
+"TC-DAT-006","Multiple invalid inputs simultaneously","Verify INVALID_MONITORING_DATA is reported once when multiple fields are invalid at the same time","Timestamp=45.0s
+VehicleSpeed=-10 km/h
+BrakePedal=MAYBE
+BrakePressure=200 bar
+FL=-5 km/h
+FR=50 km/h
+RL=50 km/h
+RR=50 km/h","Exhaustive","Faults=INVALID_MONITORING_DATA; OverallStatus=INVALID_DATA","Pending","Yes","Covers DAT-01, DAT-02, DAT-04; section 9 'Multiple invalid inputs'"
+"TC-DAT-007","Vehicle speed zero boundary is valid","Verify vehicle speed of exactly 0 km/h is accepted as valid input","Timestamp=46.0s
+VehicleSpeed=0 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=0 km/h
+FR=0 km/h
+RL=0 km/h
+RR=0 km/h","Edge","Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers DAT-01 boundary (valid side)"
+"TC-DAT-008","Wheel speed zero boundary is valid","Verify a wheel speed of exactly 0 km/h is accepted as valid input","Timestamp=47.0s
+VehicleSpeed=0 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=0 km/h
+FR=0 km/h
+RL=0 km/h
+RR=0 km/h","Edge","Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers DAT-02 boundary (valid side)"
+"TC-DAT-009","Brake pedal status TRUE is valid","Verify brake pedal status of TRUE is accepted as valid input","Timestamp=48.0s
+VehicleSpeed=50 km/h
+BrakePedal=TRUE
+BrakePressure=30 bar
+FL=50 km/h
+FR=50 km/h
+RL=50 km/h
+RR=50 km/h","Positive","Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers DAT-04 (valid TRUE value)"
+"TC-DAT-010","Brake pedal status FALSE is valid","Verify brake pedal status of FALSE is accepted as valid input","Timestamp=49.0s
+VehicleSpeed=50 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=50 km/h
+FR=50 km/h
+RL=50 km/h
+RR=50 km/h","Positive","Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers DAT-04 (valid FALSE value)"
+"TC-NRM-001","Vehicle fully stationary","Verify NORMAL overall status when vehicle is completely stationary with no braking","Timestamp=50.0s
+VehicleSpeed=0 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=0 km/h
+FR=0 km/h
+RL=0 km/h
+RR=0 km/h","Positive","Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers section 9 'Vehicle stationary'"
+"TC-NRM-002","Vehicle moving without braking","Verify NORMAL overall status when vehicle is moving normally without the brake pedal pressed","Timestamp=51.0s
+VehicleSpeed=60 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=61 km/h
+FR=59 km/h
+RL=60 km/h
+RR=60 km/h","Positive","Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers section 9 'Vehicle moving without braking'"
+"TC-NRM-003","Vehicle braking with normal brake pressure","Verify NORMAL overall status when the vehicle is braking with a valid, non-zero brake pressure","Timestamp=52.0s
+VehicleSpeed=45 km/h
+BrakePedal=TRUE
+BrakePressure=25 bar
+FL=45 km/h
+FR=45 km/h
+RL=45 km/h
+RR=45 km/h","Positive","Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers section 9 'Vehicle braking with normal brake pressure'"
+"TC-NRM-004","All wheel speeds within expected difference","Verify NORMAL overall status when all wheel speeds are within the acceptable difference from vehicle speed","Timestamp=53.0s
+VehicleSpeed=70 km/h
+BrakePedal=FALSE
+BrakePressure=0 bar
+FL=74 km/h
+FR=66 km/h
+RL=72 km/h
+RR=68 km/h","Positive","Faults=NO_FAULT; OverallStatus=NORMAL","Pending","Yes","Covers section 9 'All wheel speeds within expected difference'"
