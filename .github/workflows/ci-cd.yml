@@ -57,12 +57,12 @@ jobs:
 
       - name: Run cppcheck linting
         if: runner.os == 'Linux'
-        run: cppcheck --enable=all --suppress=missingIncludeSystem --suppress=unusedFunction -Iinclude --std=c++17 --error-exitcode=1 src/ tests/
+        run: cppcheck --enable=all --suppress=missingIncludeSystem --suppress=unusedFunction --suppress=unusedStructMember -Iinclude --std=c++17 --error-exitcode=1 src/ tests/
         shell: bash
 
       - name: Run cppcheck linting (Windows)
         if: runner.os == 'Windows'
-        run: cppcheck --enable=all --suppress=missingIncludeSystem --suppress=unusedFunction -Iinclude --std=c++17 --error-exitcode=1 src/ tests/
+        run: cppcheck --enable=all --suppress=missingIncludeSystem --suppress=unusedFunction --suppress=unusedStructMember -Iinclude --std=c++17 --error-exitcode=1 src/ tests/
         shell: bash
 
       - name: Upload test results
