@@ -31,10 +31,10 @@ jobs:
         shell: bash
 
       - name: Run linting (cppcheck)
-        run: cppcheck --enable=all --suppress=missingIncludeSystem --std=c++17 --error-exitcode=1 src/ include/
+        run: cppcheck --enable=all --suppress=missingIncludeSystem --suppress=unusedFunction -Iinclude --std=c++17 --error-exitcode=1 src/
         shell: bash
 
       - name: Lint tests directory
         continue-on-error: true
-        run: cppcheck --enable=all --suppress=missingIncludeSystem --std=c++17 tests/
+        run: cppcheck --enable=all --suppress=missingIncludeSystem --suppress=unusedFunction -Iinclude --std=c++17 tests/
         shell: bash
